@@ -1,12 +1,12 @@
-import { User } from "../models/user.models";
+import { User } from "../models/user.models.js";
 
 export const registerUser = async (req, res) => {
 
     const { username, email, password } = req.body;
     try {
-        let user = User.findOne({ email })
+        let user = await User.findOne({ email })
         if (user) {
-            res.status(400).json({
+            return res.status(400).json({
                 status: "failure",
                 data: {
                     statusCode: 400,
@@ -14,13 +14,25 @@ export const registerUser = async (req, res) => {
                 }
             })
         }
-        user = User.save({username, email, password})
-        let userCreated = user.findOne({email}).select("-password")
-        res.status(201).json({
-            status:"success",
-            data:{
+        user = await User.create({ username, email, password })
+
+        let createdUser = await User.findOne({ _id: user._id }).select("-password")
+
+        if (!createdUser) {
+            return res.status(409).json({
+                status: "failure",
+                data: {
+                    statusCode: 429,
+                    value: "User could not be created because of some internal error"
+                }
+            })
+        }
+
+        return res.status(201).json({
+            status: "success",
+            data: {
                 statusCode: 201,
-                value: userCreated
+                value: createdUser
             }
         })
     } catch (error) {
