@@ -5,26 +5,26 @@ import { faTrash } from "@fortawesome/free-solid-svg-icons";
 
 function Todo(props) {
   return (
-    <div
-      // onClick={toggleComplete}
-      className={`${props.completed ? "completed" : ""}`}
-    >
-      <div className="Todo">
-        <p>{props.todoItem}</p>
-        <div>
-          <FontAwesomeIcon
-            icon={faPenToSquare}
-            // onClick={() => {
-            //   props.editListItem(props.index);
-            // }}
-          />
-          <FontAwesomeIcon
-            icon={faTrash}
-            onClick={() => {
-              props.deleteListItem(props.index);
-            }}
-          />
-        </div>
+    <div className="Todo">
+      <p
+        className={`${props.completed ? "completed" : ""}`}
+        onClick={() => props.toggleComplete(props.index)}
+      >
+        {props.todoItem}
+      </p>
+      <div>
+        <FontAwesomeIcon
+          icon={faPenToSquare}
+          onClick={() => {
+            props.editListItem(props.index);
+          }}
+        />
+        <FontAwesomeIcon
+          icon={faTrash}
+          onClick={() => {
+            props.deleteListItem(props.index);
+          }}
+        />
       </div>
     </div>
   );
