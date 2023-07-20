@@ -1,6 +1,6 @@
 import { body } from "express-validator";
 
-export const validateRegister = (req, res) => {
+export const validateRegister = () => {
     return [
         body("username")
         .trim()
@@ -22,6 +22,5 @@ export const validateRegister = (req, res) => {
         .trim()
         .notEmpty()
         .withMessage("Password is required")
-
     ]
 }
