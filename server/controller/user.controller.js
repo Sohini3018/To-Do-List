@@ -1,4 +1,5 @@
 import { User } from "../models/user.models.js";
+import bcrypt from "bcrypt"
 
 export const registerUser = async (req, res) => {
 
@@ -38,4 +39,44 @@ export const registerUser = async (req, res) => {
     } catch (error) {
         console.log("Internal server error: " + error);
     }
+}
+
+export const loginUser = async (req, res) => {
+    const { email, password } = req.body
+    try {
+        let user = await User.findOne({ email: email })
+        if (!user) {
+            return res.status(401).json({
+                status: "failure",
+                data: {
+                    statusCode: 401,
+                    value: "Please enter correct credentials"
+                }
+            })
+        }
+        let correctPassword = await bcrypt.compare(password,user.password)
+        if(correctPassword){
+            return res.status(200).json({
+                status: "success",
+                data: {
+                    statusCode: 200,
+                    value: {
+                        userID: user._id,
+                        username: user.username,
+                        email: user.email
+                    }
+                }
+            })
+        }
+        return res.status(401).json({
+            status: "failure",
+                data: {
+                    statusCode: 401,
+                    value: "Please enter the correct crendentials"
+                }
+        })
+    } catch (error) {
+        console.log("Error in loginRouter", error);
+    }
+
 }
