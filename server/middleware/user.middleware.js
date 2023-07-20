@@ -24,3 +24,15 @@ export const validateRegister = () => {
         .withMessage("Password is required")
     ]
 }
+
+export const validateLogin = ()=>{
+    return [
+        body("email")
+        .isEmail()
+        .withMessage("Email is invalid"),
+
+        body("password")
+        .notEmpty()
+        .withMessage("Password is required")
+    ]
+}
