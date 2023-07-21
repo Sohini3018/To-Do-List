@@ -64,7 +64,7 @@ export const getTodo = async (req, res) => {
             })
         }
         const todoGot = await Todo.find({ user: userId })
-        res.status(200).json({
+        return res.status(200).json({
             status: "success",
             data: {
                 statusCode: 200,
@@ -73,11 +73,44 @@ export const getTodo = async (req, res) => {
         })
     } catch (error) {
         console.log(error);
-        res.status(500).json({
+        return res.status(500).json({
             status: "failure",
             data: {
                 statusCode: 500,
                 value: "Internal Server Error",
+            }
+        })
+    }
+
+}
+
+export const deleteTodo = async (req, res) => {
+    const { todoId } = req.params
+    try {
+        const todoGot = await Todo.findOneAndDelete({ _id: todoId })
+        if (!todoGot) {
+            return res.status(404).json({
+                status: "failure",
+                data: {
+                    statusCode: 404,
+                    value: "No todo found to be deleted"
+                }
+            })
+        }
+        return res.status(200).json({
+            status: "success",
+            data: {
+                statusCode: 200,
+                value: "Todo deleted successfully"
+            }
+        })
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({
+            status: "failure",
+            data: {
+                statusCode: 500,
+                value: "Internal Server Error" + error.message,
             }
         })
     }
