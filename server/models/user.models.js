@@ -17,7 +17,7 @@ const userSchema = mongoose.Schema({
             required: [true, "Password is required"],
         }
     },
-    { timestamp: true }
+    { timestamps: true }
 )
 
 userSchema.pre("save",async function(){
