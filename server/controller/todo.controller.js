@@ -116,3 +116,36 @@ export const deleteTodo = async (req, res) => {
     }
 
 }
+
+export const updateTodo = async (req, res) => {
+    const { todoId } = req.params
+    const { todo } = req.body
+    try {
+        const todoGot = await Todo.findOneAndUpdate({ _id: todoId }, { $set: { todo: todo } })
+        if (!todoGot) {
+            return res.status(404).json({
+                status: "failure",
+                data: {
+                    statusCode: 404,
+                    value: "Not found any todo to delete"
+                }
+            })
+        }
+        return res.status(200).json({
+            status: "failure",
+            data: {
+                statusCode: 200,
+                value: "Todo updated successfully"
+            }
+        })
+    } catch (error) {
+        console.log(error.message);
+        return res.status(500).json({
+            status: "failure",
+            data: {
+                statusCode: 500,
+                value: "Internal Server Error" + error.message,
+            }
+        })
+    }
+}
