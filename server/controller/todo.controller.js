@@ -1,5 +1,6 @@
 import { Todo } from "../models/todo.models.js"
 import { User } from "../models/user.models.js"
+import { ObjectId } from "mongoose"
 
 export const createTodo = async (req, res) => {
     const { todo, isComplete, user } = req.body
@@ -43,6 +44,41 @@ export const createTodo = async (req, res) => {
                 value: "Internal Server Error",
             }
 
+        })
+    }
+
+}
+
+export const getTodo = async (req, res) => {
+    const { userId } = req.params
+    console.log(userId);
+    try {
+        const userGot = await User.findOne({ _id: userId })
+        if (!userGot) {
+            return res.status(404).json({
+                status: "failure",
+                data: {
+                    statusCode: 404,
+                    value: "Enter correct user details"
+                }
+            })
+        }
+        const todoGot = await Todo.find({ user: userId })
+        res.status(200).json({
+            status: "success",
+            data: {
+                statusCode: 200,
+                value: todoGot
+            }
+        })
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({
+            status: "failure",
+            data: {
+                statusCode: 500,
+                value: "Internal Server Error",
+            }
         })
     }
 
