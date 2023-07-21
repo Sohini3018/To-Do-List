@@ -11,7 +11,7 @@ export const validateTodo = () => {
         .notEmpty()
         .withMessage("isComplete option cannot be empty"),
 
-        body("userID")
+        body("user")
         .trim()
         .notEmpty()
         .withMessage("userID option cannot be empty"),
