@@ -1,26 +1,71 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import TodoForm from "./TodoForm";
 import Todo from "./Todo";
 import { v4 as uuidv4 } from "uuid";
 import EditTodoForm from "./EditTodoForm";
+import toast, { Toaster } from 'react-hot-toast';
+
 uuidv4();
 function TodoWrapper() {
   const [todoObj, setTodoObj] = useState([]);
+  let userId = JSON.parse(localStorage.getItem("user")).userID
+
+  // fetchTodos 
+  const fetchTodos = async () => {
+    try {
+      const response = await fetch(`http://localhost:8000/api/v1/todo/${userId}`)
+      const todoData = await response.json()
+      if (todoData.data.statusCode === 200) {
+        setTodoObj(todoData.data.value)
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+
+  }
+
   // Each task TodoForm is taken as each todo
-  const addTodo = (todo) => {
-    // console.log(todo);
-    setTodoObj([
-      ...todoObj,
-      { id: uuidv4(), task: todo, completed: false, isEditing: false },
-    ]);
-    // console.log(todoObj);
+  const addTodo = async (todo) => {
+    console.log(userId);
+    try {
+      const response = await fetch("http://localhost:8000/api/v1/todo/todoCreate", {
+        method: "POST",
+        mode: "cors",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({
+          "todo": todo,
+          "isComplete": false,
+          "user": userId
+        })
+
+      })
+      const todoData = await response.json()
+      if (todoData.data.statusCode === 201) {
+        toast.success("Todo added successfully")
+        fetchTodos()
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
-  const deleteListItem = (id) => {
+  const deleteListItem = async (id) => {
     // Copy Previous Array
-    let newTodoArray = [...todoObj];
-    newTodoArray.splice(id, 1);
-    setTodoObj([...newTodoArray]); // Copy the array after deleting wrt to id.
+    try {
+      const response = await fetch(`http://localhost:8000/api/v1/todo/${id}`, {
+        method: "DELETE"
+      })
+      const data = await response.json()
+      if (data.data.statusCode === 200) {
+        toast.success("Todo deleted successfully")
+        fetchTodos()
+      }
+    } catch (error) {
+      console.log(error.message);
+    }
+
   };
 
   const toggleComplete = (id) => {
@@ -33,6 +78,8 @@ function TodoWrapper() {
     );
   };
 
+  //! TODO: configure edit  
+
   const editListItem = (id) => {
     setTodoObj(
       todoObj.map((todoItem) =>
@@ -43,7 +90,7 @@ function TodoWrapper() {
     );
   };
 
-  const editTask = (editedTask, id) => {
+  const editTask = async (editedTask, id) => {
     setTodoObj(
       todoObj.map((todoItem) =>
         todoItem.id === id
@@ -53,8 +100,16 @@ function TodoWrapper() {
     );
   };
 
+  useEffect(() => {
+    fetchTodos()
+  }, [])
+
   return (
     <div className="TodoWrapper">
+      <Toaster
+        position="top-right"
+        reverseOrder={false}
+      />
       <h1>Schedule You Day!</h1>
       <TodoForm addTodo={addTodo} />
 
@@ -68,10 +123,10 @@ function TodoWrapper() {
           />
         ) : (
           <Todo
-            todoItem={todo.task}
-            key={todo.id}
-            index={todo.id}
-            completed={todo.completed}
+            todoItem={todo.todo}
+            key={todo._id}
+            index={todo._id}
+            completed={todo.isComplete}
             toggleComplete={toggleComplete}
             deleteListItem={deleteListItem}
             editListItem={editListItem}

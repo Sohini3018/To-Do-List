@@ -20,10 +20,10 @@ export const registerUser = async (req, res) => {
         let createdUser = await User.findOne({ _id: user._id }).select("-password")
 
         if (!createdUser) {
-            return res.status(409).json({
+            return res.status(500).json({
                 status: "failure",
                 data: {
-                    statusCode: 429,
+                    statusCode: 500,
                     value: "User could not be created because of some internal error"
                 }
             })
