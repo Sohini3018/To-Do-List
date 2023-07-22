@@ -9,6 +9,7 @@ uuidv4();
 function TodoWrapper() {
   const [todoObj, setTodoObj] = useState([]);
   let userId = JSON.parse(localStorage.getItem("user")).userID
+  // console.log(userId);
 
   // fetchTodos 
   const fetchTodos = async () => {
@@ -26,7 +27,6 @@ function TodoWrapper() {
 
   // Each task TodoForm is taken as each todo
   const addTodo = async (todo) => {
-    console.log(userId);
     try {
       const response = await fetch("http://localhost:8000/api/v1/todo/todoCreate", {
         method: "POST",
@@ -83,7 +83,7 @@ function TodoWrapper() {
   const editListItem = (id) => {
     setTodoObj(
       todoObj.map((todoItem) =>
-        todoItem.id === id
+        todoItem._id === id
           ? { ...todoItem, isEditing: !todoItem.isEditing }
           : todoItem
       )
@@ -91,9 +91,26 @@ function TodoWrapper() {
   };
 
   const editTask = async (editedTask, id) => {
+    console.log("edited Task", editedTask);
+    const response = await fetch(`http://localhost:8000/api/v1/todo/${id}`, {
+      method: "PATCH",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        todo: editedTask
+      })
+    })
+    const data = await response.json()
+    console.log(data.data);
+    if (data.data.statusCode === 200) {
+      fetchTodos()
+      toast.success("Todo updated successfully")
+    }
     setTodoObj(
       todoObj.map((todoItem) =>
-        todoItem.id === id
+        todoItem._id === id
           ? { ...todoItem, task: editedTask, isEditing: !todoItem.isEditing }
           : todoItem
       )
@@ -117,9 +134,9 @@ function TodoWrapper() {
         todo.isEditing ? (
           <EditTodoForm
             editListItem={editTask}
-            todoItem={todo.task}
-            key={todo.id}
-            id={todo.id}
+            todoItem={todo.todo}
+            key={todo._id}
+            id={todo._id}
           />
         ) : (
           <Todo

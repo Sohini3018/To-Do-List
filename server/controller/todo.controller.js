@@ -119,15 +119,24 @@ export const deleteTodo = async (req, res) => {
 
 export const updateTodo = async (req, res) => {
     const { todoId } = req.params
-    const { todo } = req.body
+    const { todo, isComplete } = req.body
     try {
-        const todoGot = await Todo.findOneAndUpdate({ _id: todoId }, { $set: { todo: todo } })
+        let todoGot;
+        console.log(todo, isComplete);
+        if (todo) {
+            todoGot = await Todo.findOneAndUpdate({ _id: todoId }, { $set: { todo: todo } })
+            console.log(todoGot);
+        }
+        if (isComplete !== "undefined") {
+            todoGot = await Todo.findOneAndUpdate({ _id: todoId }, { $set: { isComplete: isComplete } })
+            console.log(todoGot);
+        }
         if (!todoGot) {
             return res.status(404).json({
                 status: "failure",
                 data: {
                     statusCode: 404,
-                    value: "Not found any todo to delete"
+                    value: "Not found any todo to update"
                 }
             })
         }
