@@ -4,12 +4,10 @@ function EditTodoForm(props) {
   const [task, setTask] = useState(props.todoItem);
   const handleChange = (event) => {
     setTask(event.target.value);
-    // console.log(event.target.value);
   };
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    // console.log(task);
     if (task !== "") {
       props.editListItem(task, props.id);
     }
@@ -19,7 +17,7 @@ function EditTodoForm(props) {
   const handleEnterPress = (event) => {
     if (event.key === "Enter") {
       if (task !== "") {
-        props.editListItem(task);
+        props.editListItem(task, props.id);
       }
       setTask("");
     }

@@ -9,6 +9,10 @@ const todoSchema = mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    isEditing: {
+        type: Boolean,
+        default: false,
+    },
     user: {
         type: mongoose.SchemaTypes.ObjectId,
         ref: "User"
