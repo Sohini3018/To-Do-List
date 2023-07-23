@@ -4,9 +4,11 @@ import Todo from "./Todo";
 import { v4 as uuidv4 } from "uuid";
 import EditTodoForm from "./EditTodoForm";
 import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from "react-router-dom";
 
 uuidv4();
 function TodoWrapper() {
+  const navigate = useNavigate()
   const [todoObj, setTodoObj] = useState([]);
   let userId = JSON.parse(localStorage.getItem("user")).userID
   // console.log(userId);
@@ -117,6 +119,11 @@ function TodoWrapper() {
     );
   };
 
+  const handleLogout = () => {
+    localStorage.clear()
+    navigate("/login")
+  }
+
   useEffect(() => {
     fetchTodos()
   }, [])
@@ -127,7 +134,10 @@ function TodoWrapper() {
         position="top-right"
         reverseOrder={false}
       />
-      <h1>Schedule You Day!</h1>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h1>Schedule You Day!</h1>
+        <button onClick={handleLogout} className="logout-button">logout</button>
+      </div>
       <TodoForm addTodo={addTodo} />
 
       {todoObj.map((todo) =>
