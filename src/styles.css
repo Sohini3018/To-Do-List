@@ -128,7 +128,24 @@ h1 {
   font-weight: 400px;
 }
 
+.btn:hover{
+  cursor: pointer;
+}
+
 .change-page{
   display: flex;
   margin: 20px auto 0px auto;
+}
+
+.logout-button {
+  padding: 15px 20px;
+  background-color: #8758FF;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 14px
+}
+
+.logout-button:hover{
+  cursor: pointer;
 }

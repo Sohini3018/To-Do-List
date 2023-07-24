@@ -4,25 +4,32 @@ import Todo from "./Todo";
 import { v4 as uuidv4 } from "uuid";
 import EditTodoForm from "./EditTodoForm";
 import toast, { Toaster } from 'react-hot-toast';
+import { useNavigate } from "react-router-dom";
 
 uuidv4();
 function TodoWrapper() {
+  const navigate = useNavigate()
   const [todoObj, setTodoObj] = useState([]);
-  let userId = JSON.parse(localStorage.getItem("user")).userID
-  // console.log(userId);
+  const [userId, setUserId] = useState()
 
   // fetchTodos 
   const fetchTodos = async () => {
+    let val;
+    if (JSON.parse(localStorage.getItem("user")) !== null) {
+      val = JSON.parse(localStorage.getItem("user")).userID
+      setUserId(JSON.parse(localStorage.getItem("user")).userID)
+    }
     try {
-      const response = await fetch(`http://localhost:8000/api/v1/todo/${userId}`)
+      // console.log(userId);
+      const response = await fetch(`http://localhost:8000/api/v1/todo/${val}`)
       const todoData = await response.json()
+      // console.log(data);
       if (todoData.data.statusCode === 200) {
         setTodoObj(todoData.data.value)
       }
     } catch (error) {
       console.log(error.message);
     }
-
   }
 
   // Each task TodoForm is taken as each todo
@@ -68,11 +75,33 @@ function TodoWrapper() {
 
   };
 
-  const toggleComplete = (id) => {
+  const toggleComplete = async (id) => {
+    let element = todoObj.find((el) => el._id === id)
+    let complete = !element.isComplete
+    const response = await fetch(`http://localhost:8000/api/v1/todo/${id}`, {
+      method: "PATCH",
+      mode: "cors",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        isComplete: complete
+      })
+    })
+    const data = await response.json()
+    console.log(data.data);
+    if (data.data.statusCode === 200) {
+      fetchTodos()
+      if (complete) {
+        toast.success("Todo marked completed")
+      } else {
+        toast.success("Todo unmarked completed")
+      }
+    }
     setTodoObj(
       todoObj.map((todoItem) =>
-        todoItem.id === id
-          ? { ...todoItem, completed: !todoItem.completed }
+        todoItem._id === id
+          ? { ...todoItem, isComplete: !complete }
           : todoItem
       )
     );
@@ -117,8 +146,15 @@ function TodoWrapper() {
     );
   };
 
+  const handleLogout = () => {
+    localStorage.clear()
+    navigate("/login")
+  }
+
   useEffect(() => {
-    fetchTodos()
+    if (userId !== null) {
+      fetchTodos()
+    }
   }, [])
 
   return (
@@ -127,7 +163,10 @@ function TodoWrapper() {
         position="top-right"
         reverseOrder={false}
       />
-      <h1>Schedule You Day!</h1>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <h1>Schedule You Day!</h1>
+        <button onClick={handleLogout} className="logout-button">logout</button>
+      </div>
       <TodoForm addTodo={addTodo} />
 
       {todoObj.map((todo) =>
